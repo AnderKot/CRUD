@@ -1,0 +1,35 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="UperBar">
+    <label top: calc(50% - 20px);>Фильтр: </label>
+
+    <label for="dateFrom" >C :</label>
+    <select multiple size="1">
+        <option style="background-color:black;color:white;" disabled>Не Выбран</option>
+        <option>20.04.22</option>
+        <option>20.04.23</option>
+        <option>20.04.24</option>
+        <option>20.04.25</option>
+    </select>
+
+    <label for="dateTo" >По: </label>
+    <select multiple size="1">
+        <option style="background-color:black;color:white;" disabled>Не Выбран</option>
+        <option>20.04.22</option>
+        <option>20.04.23</option>
+        <option>20.04.24</option>
+        <option>20.04.25</option>
+    </select>
+
+    <button class="FilterButton">
+        Применить фильтр
+    </button>
+
+    <button class="PlusButton">
+        Создать заказ
+    </button>
+</div>
