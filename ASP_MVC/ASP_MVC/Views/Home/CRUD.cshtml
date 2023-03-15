@@ -1,7 +1,10 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+
+@model CRUDModel
 @{
+    
 }
 
 <div class="UperBar">
@@ -9,27 +12,49 @@
 
     <label for="dateFrom" >C :</label>
     <select multiple size="1">
-        <option style="background-color:black;color:white;" disabled>Не Выбран</option>
-        <option>20.04.22</option>
-        <option>20.04.23</option>
-        <option>20.04.24</option>
-        <option>20.04.25</option>
+        <option>Не Выбран</option>
+        @foreach (DateTime option in Model.FromDatelist)
+        {
+            <option>@option.ToShortDateString()</option>
+        }
     </select>
 
     <label for="dateTo" >По: </label>
     <select multiple size="1">
-        <option style="background-color:black;color:white;" disabled>Не Выбран</option>
-        <option>20.04.22</option>
-        <option>20.04.23</option>
-        <option>20.04.24</option>
-        <option>20.04.25</option>
+        <option>Не Выбран</option>
+        @foreach (DateTime option in Model.ToDatelist)
+        {
+            <option>@option.ToShortDateString()</option>
+        }
     </select>
 
     <button class="FilterButton">
-        Применить фильтр
+        <label>Применить фильтр</label>
     </button>
 
     <button class="PlusButton">
-        Создать заказ
+        <label>Cоздать заказ</label>
     </button>
 </div>
+
+<p>
+    <div class="tableContainer">
+        <table cols="число">
+            <tr>
+                <th>ID</th>
+                <th>Заказ Но.</th>
+                <th>Дата</th>
+                <th>Поставщик</th>
+            </tr>
+            @foreach (DateBaseOrderModel order in Model.TableData)
+            {
+                <tr>
+                    <td>@order.Id.ToString()</td>
+                    <td>@order.Number.ToString()</td>
+                    <td>@order.Date.ToLongDateString()</td>
+                    <td>@order.Provider?.Name.ToString()</td>
+                </tr>
+            }
+        </table>
+    </div>
+<p/>

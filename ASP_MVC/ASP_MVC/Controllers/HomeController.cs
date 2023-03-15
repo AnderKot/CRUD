@@ -7,10 +7,13 @@ namespace ASP_MVC.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ICRUDModelManager _CRUDModelManager;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ICRUDModelManager CRUDModelManager)
         {
             _logger = logger;
+            _CRUDModelManager = CRUDModelManager;
+
         }
 
         public IActionResult Index()
@@ -25,7 +28,7 @@ namespace ASP_MVC.Controllers
 
         public IActionResult CRUD()
         {
-            return View();
+            return View(_CRUDModelManager.GetCRUDModel());
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
