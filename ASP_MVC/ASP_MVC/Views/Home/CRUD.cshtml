@@ -7,6 +7,8 @@
     
 }
 
+
+
 <div class="UperBar">
     <label top: calc(50% - 20px);>Фильтр: </label>
 
@@ -39,22 +41,30 @@
 
 <p>
     <div class="tableContainer">
-        <table cols="число">
-            <tr>
-                <th>ID</th>
-                <th>Заказ Но.</th>
-                <th>Дата</th>
-                <th>Поставщик</th>
-            </tr>
-            @foreach (DateBaseOrderModel order in Model.TableData)
-            {
+        <table id="CRUD_Table" cols="число">
+            <thead>
                 <tr>
-                    <td>@order.Id.ToString()</td>
-                    <td>@order.Number.ToString()</td>
-                    <td>@order.Date.ToLongDateString()</td>
-                    <td>@order.Provider?.Name.ToString()</td>
+                    <th>ID</th>
+                    <th>Заказ Но.</th>
+                    <th>Дата</th>
+                    <th>Поставщик</th>
                 </tr>
-            }
+            </thead>
+            <tbody>
+                @foreach (DateBaseOrderModel order in Model.TableData)
+                {
+                    <tr onclick="ClickOnLine(this)">
+                        <td>@order.Id.ToString()</td>
+                        <td>@order.Number.ToString()</td>
+                        <td>@order.Date.ToLongDateString()</td>
+                        <td>@order.Provider?.Name.ToString()</td>
+                    </tr>
+                }
+            </tbody>
+
         </table>
     </div>
 <p/>
+
+
+
