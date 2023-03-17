@@ -8,12 +8,13 @@ namespace ASP_MVC.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ICRUDModelManager _CRUDModelManager;
+        private readonly IOrderModelManager _OrderModelManager;
 
-        public HomeController(ILogger<HomeController> logger, ICRUDModelManager CRUDModelManager)
+        public HomeController(ILogger<HomeController> logger, ICRUDModelManager CRUDModelManager, IOrderModelManager OrderModelManager)
         {
             _logger = logger;
             _CRUDModelManager = CRUDModelManager;
-
+            _OrderModelManager = OrderModelManager;
         }
 
         public IActionResult Index()
@@ -30,20 +31,13 @@ namespace ASP_MVC.Controllers
 
         public IActionResult CRUD(string From, string To)
         {
-            DateTime dateFrom = DateTime.Today.AddMonths(-1); ;
-            DateTime dateTo = DateTime.Today;
+            return View(_CRUDModelManager.GetCRUDModel(From, To));
+        }
 
-            if ((From != "Не Выбран")&(From != null))
-            {
-                dateFrom = DateTime.Parse(From);
-            }
-
-            if ((To != "Не Выбран")&(To != null))
-            {
-                dateTo = DateTime.Parse(To);
-            }
-            
-            return View(_CRUDModelManager.GetCRUDModel(dateFrom, dateTo));
+        [HttpGet]
+        public IActionResult Order(string id)
+        {
+            return PartialView(_OrderModelManager.GetOrder(id));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

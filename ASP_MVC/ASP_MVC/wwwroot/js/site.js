@@ -26,6 +26,15 @@ function ClickOnLine(row) {
     }
 }
 
+function DoubleClickOnLine(order_id) {
+    
+
+    $.get(document.location.protocol + "//" + document.location.host + "/Home/Order?id=" + order_id, function (data) {
+        $('#dialogContent').html(data);
+        $('#modDialog').modal('show');
+    });
+}
+
 function SelectFilters(list) {
     let selectedOption = list.options[list.selectedIndex];
     console.log('javascript_' + list.id);
@@ -52,3 +61,4 @@ function SetFilters() {
     }
 
 }
+

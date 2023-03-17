@@ -1,21 +1,21 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-
-@model CRUDModel
-@{
-    
-}
-
-
+﻿@model CRUDModel
 
 <div class="UperBar">
     <label top: calc(50% - 20px);>Фильтр: </label>
 
     <label for="DateFrom">C :</label>
     <select onChange="SelectFilters(this)" id="DateFrom" size="1">
-        <option selected="selected">Не Выбран</option>
-        @foreach (DateTime option in Model.FromDatelist)
+        
+        @if (Model.SelectedDateFrom != "Не Выбран")
+        {
+            <option >Не Выбран</option>
+            <option selected="selected">@Model.SelectedDateFrom</option>
+        }
+        else
+        {
+            <option selected="selected">Не Выбран</option>
+        }
+        @foreach (DateTime option in Model.Datelist)
         {
             <option>@option.ToShortDateString()</option>
         }
@@ -23,8 +23,16 @@
 
     <label for="DateTo" >По: </label>
     <select onChange="SelectFilters(this)" id="DateTo" size="1">
-        <option selected="selected">Не Выбран</option>
-        @foreach (DateTime option in Model.ToDatelist)
+        @if (Model.SelectedDateTo != "Не Выбран")
+        {
+            <option >Не Выбран</option>
+            <option selected="selected">@Model.SelectedDateTo</option>
+        }
+        else
+        {
+            <option selected="selected">Не Выбран</option>
+        }
+        @foreach (DateTime option in Model.Datelist)
         {
             <option>@option.ToShortDateString()</option>
         }
@@ -40,6 +48,12 @@
 </div>
 
 <p>
+    <div class="modal" tabindex="-1" role="dialog" id="modDialog" style="min-width:850px;">
+        <div class="modal-dialog" role="document" id="dialogContent" style="min-width:850px;"></div>
+    </div>
+</p>
+
+<p>
     <div class="tableContainer">
         <table id="CRUD_Table" cols="число">
             <thead>
@@ -53,7 +67,7 @@
             <tbody>
                 @foreach (DateBaseOrderModel order in Model.TableData)
                 {
-                    <tr onclick="ClickOnLine(this)">
+                    <tr onclick="ClickOnLine(this)" ondblclick="DoubleClickOnLine(@order.Id.ToString())">
                         <td>@order.Id.ToString()</td>
                         <td>@order.Number.ToString()</td>
                         <td>@order.Date.ToLongDateString()</td>

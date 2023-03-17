@@ -9,21 +9,28 @@ namespace ASP_MVC.Models
     public class CRUDModel
     {
         // -- поля 
-        List<DateTime> toDatelist;
-        List<DateTime> fromDatelist;
-        List<DateBaseOrderModel> tableData;
+        string selectedDateFrom; //компонент фильтра Даты "От"
+        string selectedDateTo;   //компонент фильтра Даты "До"
+        List<DateTime> datelist; //Список дат для выбора в фильтрах
+        List<DateBaseOrderModel> tableData; //Список Заказов
 
-        // -- Свойства
-        public List<DateTime> ToDatelist
+        // -- Свойства To-Do вынести в Интерфейс ?
+        public string SelectedDateFrom
         {
-            get { return toDatelist; }
-            set { toDatelist = value; }
+            get { return selectedDateFrom; }
+            set { selectedDateFrom = value; }
         }
 
-        public List<DateTime> FromDatelist
+        public string SelectedDateTo
         {
-            get { return fromDatelist; }
-            set { fromDatelist = value; }
+            get { return selectedDateTo; }
+            set { selectedDateTo = value; }
+        }
+
+        public List<DateTime> Datelist
+        {
+            get { return datelist; }
+            set { datelist = value; }
         }
 
         public List<DateBaseOrderModel> TableData
@@ -33,32 +40,50 @@ namespace ASP_MVC.Models
         }
 
         // -- Конструкторы
-        public CRUDModel() {}
+        public CRUDModel()
+        {
+            selectedDateFrom = "Не Выбран";
+            selectedDateTo = "Не Выбран";
+        }
     }
 
-
+    // DI контейнер 
     public interface ICRUDModelManager
     {
-        //CRUDModel GetCRUDModel();
-
-        CRUDModel GetCRUDModel(DateTime from, DateTime to);
+        CRUDModel GetCRUDModel(string From, string To);
     }
 
+    //
     public class CRUDModelManager : ICRUDModelManager
     {
-        public CRUDModel GetCRUDModel(DateTime dateFrom, DateTime dateTo)
+        public CRUDModel GetCRUDModel(string From, string To)
         {
             CRUDModel NewCRUDModel = new CRUDModel();
+
+            DateTime dateFrom = DateTime.Today.AddMonths(-1); ;
+            DateTime dateTo = DateTime.Today;
+
+            // определяем выбранные фильтры по дате
+            if ((From != "Не Выбран") & (From != null))
+            {
+                dateFrom = DateTime.Parse(From);
+                NewCRUDModel.SelectedDateFrom = From;
+            }
+
+            if ((To != "Не Выбран") & (To != null))
+            {
+                dateTo = DateTime.Parse(To);
+                NewCRUDModel.SelectedDateTo = To;
+            }
+
+            // Выгрузка данных из базы
             using (DateBaseApplicationContext DB = new DateBaseApplicationContext())
             {
-                List<DateTime> NewDateList = DB.Orders.OrderBy(order => order.Id).Where(order => (order.Date >= dateFrom) & (order.Date <= dateTo)).Select(order => order.Date).Distinct().ToList();
-                
+                // Список Дат для выбора фильтра
+                NewCRUDModel.Datelist = DB.Orders.OrderBy(order => order.Id).Where(order => (order.Date > dateFrom) & (order.Date < dateTo)).Select(order => order.Date).Distinct().ToList();
+                // Список заказов
                 NewCRUDModel.TableData = DB.Orders.Include(order => order.Provider).Where(order => (order.Date >= dateFrom) & (order.Date <= dateTo)).ToList();
-                NewCRUDModel.ToDatelist = NewDateList;
-                NewCRUDModel.FromDatelist = NewDateList;
-
             }
-            
 
             return NewCRUDModel;
         }

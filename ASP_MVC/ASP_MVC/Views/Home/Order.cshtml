@@ -1,0 +1,49 @@
+﻿@model OrderModel
+<div class="modal-content">
+    <div class="modal-header">
+        <h4>Заказ ID: @Model.Header.Id</h4>
+    </div>
+    <div class="modal-body">
+        <div class="UperBar">
+            <label>Номер: </label>
+            <input type="text" value="@Model.Header.Number">
+
+            <label>Дата: </label>
+            <input type="date" value="@Model.Header.Date.ToString("yyyy-MM-dd")">
+
+            <label>Поставщик: </label>
+            <input type="text" value="@Model.Header.Provider.Name">
+        </div>
+        <p>
+            <div class="tableContainer">
+                <table id="CRUD_Table" cols="число">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Количество</th>
+                            <th>Единица измерения</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (DateBaseOrderItemModel item in Model.Lines)
+                        {
+                            <tr onclick="ClickOnLine(this)" ondblclick="DoubleClickOnLine(this)">
+                                <td>@item.Id.ToString()</td>
+                                <td>@item.Name</td>
+                                <td>@item.Quantity.ToString()</td>
+                                <td>@item.Unit</td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+</div>
+

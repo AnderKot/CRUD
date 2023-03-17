@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<ICRUDModelManager, CRUDModelManager>();
+builder.Services.AddTransient<IOrderModelManager, OrderModelManager>();
 
 var app = builder.Build();
 
