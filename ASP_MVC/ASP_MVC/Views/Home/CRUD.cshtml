@@ -12,18 +12,18 @@
 <div class="UperBar">
     <label top: calc(50% - 20px);>Фильтр: </label>
 
-    <label for="dateFrom" >C :</label>
-    <select multiple size="1">
-        <option>Не Выбран</option>
+    <label for="DateFrom">C :</label>
+    <select onChange="SelectFilters(this)" id="DateFrom" size="1">
+        <option selected="selected">Не Выбран</option>
         @foreach (DateTime option in Model.FromDatelist)
         {
             <option>@option.ToShortDateString()</option>
         }
     </select>
 
-    <label for="dateTo" >По: </label>
-    <select multiple size="1">
-        <option>Не Выбран</option>
+    <label for="DateTo" >По: </label>
+    <select onChange="SelectFilters(this)" id="DateTo" size="1">
+        <option selected="selected">Не Выбран</option>
         @foreach (DateTime option in Model.ToDatelist)
         {
             <option>@option.ToShortDateString()</option>
@@ -31,11 +31,11 @@
     </select>
 
     <button class="FilterButton">
-        <label>Применить фильтр</label>
+        <label onclick="SetFilters()" style="cursor:pointer">Применить фильтр</label>
     </button>
 
     <button class="PlusButton">
-        <label>Cоздать заказ</label>
+        <label style ="cursor:pointer">Cоздать заказ</label>
     </button>
 </div>
 

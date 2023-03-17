@@ -39,7 +39,7 @@ namespace ASP_MVC.Models
 
     public interface ICRUDModelManager
     {
-        CRUDModel GetCRUDModel();
+        //CRUDModel GetCRUDModel();
 
         CRUDModel GetCRUDModel(DateTime from, DateTime to);
     }
@@ -63,9 +63,9 @@ namespace ASP_MVC.Models
             return NewCRUDModel;
         }
 
-        public CRUDModel GetCRUDModel()
-        {
-            return GetCRUDModel(DateTime.Today.AddMonths(-1), DateTime.Today);
-        }
+        //public CRUDModel GetCRUDModel()
+        //{
+        //    return GetCRUDModel(DateTime.Today.AddMonths(-1), DateTime.Today);
+        //}
     }
 }

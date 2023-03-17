@@ -26,9 +26,24 @@ namespace ASP_MVC.Controllers
             return View();
         }
 
-        public IActionResult CRUD()
+
+
+        public IActionResult CRUD(string From, string To)
         {
-            return View(_CRUDModelManager.GetCRUDModel());
+            DateTime dateFrom = DateTime.Today.AddMonths(-1); ;
+            DateTime dateTo = DateTime.Today;
+
+            if ((From != "Не Выбран")&(From != null))
+            {
+                dateFrom = DateTime.Parse(From);
+            }
+
+            if ((To != "Не Выбран")&(To != null))
+            {
+                dateTo = DateTime.Parse(To);
+            }
+            
+            return View(_CRUDModelManager.GetCRUDModel(dateFrom, dateTo));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

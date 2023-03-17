@@ -51,7 +51,7 @@ namespace ASP_MVC
         public DbSet<DateBaseOrderItemModel> OrderItems => Set<DateBaseOrderItemModel>();
         public DbSet<DateBaseProviderModel> Providers => Set<DateBaseProviderModel>();
 
-        public DateBaseApplicationContext() => Database.EnsureCreated();
+        //public DateBaseApplicationContext() => Database.EnsureCreated();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
