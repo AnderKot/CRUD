@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ASP_MVC
 {
@@ -13,7 +14,6 @@ namespace ASP_MVC
         public int Id { get; set; }
         public string? Number { get; set; }
         public DateTime Date { get; set; }
-
         public int ProviderId { get; set; }
         public DateBaseProviderModel? Provider { get; set; }
     }

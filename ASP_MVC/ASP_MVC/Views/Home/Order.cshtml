@@ -28,7 +28,7 @@
                     <tbody>
                         @foreach (DateBaseOrderItemModel item in Model.Lines)
                         {
-                            <tr onclick="ClickOnLine(this)" ondblclick="DoubleClickOnLine(this)">
+                            <tr onclick="ClickOnLine(this)">
                                 <td>@item.Id.ToString()</td>
                                 <td>@item.Name</td>
                                 <td>@item.Quantity.ToString()</td>

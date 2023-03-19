@@ -3,13 +3,16 @@
 
 // Write your JavaScript code.
 var CurrRow = null;
-var DateTo = null;
-var DateFrom = null;
+var DateToFilter = null;
+var DateFromFilter = null;
+var NumberFilter = null;
+var ProviderFilter = null;
 
 function ClickOnLine(row) {
     if (CurrRow == null) {
         row.className = "SelectedRow";
         CurrRow = row;
+        console.log('javascript_' + CurrRow);
     }
     else {
         if (row.className == "SelectedRow") {
@@ -22,43 +25,73 @@ function ClickOnLine(row) {
 
             row.className = "SelectedRow";
             CurrRow = row;
+            console.log('javascript_' + CurrRow);
         }
     }
 }
 
 function DoubleClickOnLine(order_id) {
-    
-
     $.get(document.location.protocol + "//" + document.location.host + "/Home/Order?id=" + order_id, function (data) {
         $('#dialogContent').html(data);
         $('#modDialog').modal('show');
     });
 }
 
-function SelectFilters(list) {
-    let selectedOption = list.options[list.selectedIndex];
-    console.log('javascript_' + list.id);
-    switch (list.id) {
+function SelectFilters(imput) {
+    switch (imput.id) {
         case 'DateTo':
-            DateTo = selectedOption.text;
+            DateToFilter = imput.value;
+            console.log('javascript_' + imput.id + '_' + DateToFilter);
             break;
         case 'DateFrom':
-            DateFrom = selectedOption.text;
+            DateFromFilter = imput.value;
+            console.log('javascript_' + imput.id + '_' + DateFromFilter);
+            break;
+        case 'Number':
+            let selectedOption = list.options[list.selectedIndex];
+            NumberFilter = selectedOption.text;
+            console.log('javascript_' + imput.id + '_' + NumberFilter);
+            break;
+        case 'Provider':
+            let selectedOption = list.options[list.selectedIndex];
+            ProviderFilter = selectedOption.text;
+            console.log('javascript_' + imput.id + '_' + ProviderFilter);
             break;
     }
 }
 
 function SetFilters() {
-    DateFrom = DateFrom || "Не Выбран";
+    DateFrom = DateFrom || moment().add(1, 'M').format('"yyyy-MM-dd');
+    DateTo = DateTo || moment().format('"yyyy-MM-dd');
 
-    DateTo = DateTo || "Не Выбран";
+    var GETurl = document.location.protocol + "//" + document.location.host + "/Home/Orders" +
+        "?DateFrom = " + DateFromFilter +
+        "&DateTo=" + DateToFilter +
+        "&Number=" + NumberFilter +
+        "&Provider=" + ProviderFilter;
 
-    if ((DateFrom == "Не Выбран") && (DateTo == "Не Выбран")) {
-        document.location.href = document.location.protocol + "//" +document.location.host + "/Home/CRUD";
-    }
-    else {
-        document.location.href = document.location.protocol+ "//" +document.location.host + "/Home/CRUD?From=" + DateFrom + "&To=" + DateTo;
-    }
+    console.log('javascript_' + GETurl);
 
+    $.get(GETurl, function (data) {
+        let table = document.getElementById('OrderTableBody');
+        while (table.firstChild) {
+            table.removeChild(myNode.firstChild);
+        }
+
+        let JsonData = data.json();
+        let Rows = document.createDocumentFragment();
+        JsonData.forEach(order => {
+            let row = document.createElement('tr');
+
+            order.forEach(col => {
+                let td = document.createElement('td');
+                td.innerText = col;
+                row.appendChild(td);
+            });
+
+            Rows.appendChild(row);
+        });
+        table.appendChild(Rows);
+    });
 }
 

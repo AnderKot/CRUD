@@ -3,38 +3,28 @@
 <div class="UperBar">
     <label top: calc(50% - 20px);>Фильтр: </label>
 
-    <label for="DateFrom">C :</label>
-    <select onChange="SelectFilters(this)" id="DateFrom" size="1">
-        
-        @if (Model.SelectedDateFrom != "Не Выбран")
+
+    <label>Дата C </label>
+    <input onChange="SelectFilters(this)" id="DateFrom" type="date" value="@DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd")">
+
+    <label>По </label>
+    <input onChange="SelectFilters(this)" id="DateTo" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")">
+
+    <label for="Number">Номер </label>
+    <select onChange="SelectFilters(this)" id="Number" size="1">
+        <option selected="selected">Не Выбран</option>
+        @foreach (string option in Model.OrderNumber)
         {
-            <option >Не Выбран</option>
-            <option selected="selected">@Model.SelectedDateFrom</option>
-        }
-        else
-        {
-            <option selected="selected">Не Выбран</option>
-        }
-        @foreach (DateTime option in Model.Datelist)
-        {
-            <option>@option.ToShortDateString()</option>
+            <option>@option</option>
         }
     </select>
 
-    <label for="DateTo" >По: </label>
-    <select onChange="SelectFilters(this)" id="DateTo" size="1">
-        @if (Model.SelectedDateTo != "Не Выбран")
+    <label for="Provider" >Поставщик </label>
+    <select onChange="SelectFilters(this)" id="Provider" size="1">
+        <option selected="selected">Не Выбран</option>
+        @foreach (string option in Model.OrderProviderName)
         {
-            <option >Не Выбран</option>
-            <option selected="selected">@Model.SelectedDateTo</option>
-        }
-        else
-        {
-            <option selected="selected">Не Выбран</option>
-        }
-        @foreach (DateTime option in Model.Datelist)
-        {
-            <option>@option.ToShortDateString()</option>
+            <option>@option</option>
         }
     </select>
 
@@ -58,17 +48,15 @@
         <table id="CRUD_Table" cols="число">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Заказ Но.</th>
                     <th>Дата</th>
                     <th>Поставщик</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="OrderTableBody">
                 @foreach (DateBaseOrderModel order in Model.TableData)
                 {
                     <tr onclick="ClickOnLine(this)" ondblclick="DoubleClickOnLine(@order.Id.ToString())">
-                        <td>@order.Id.ToString()</td>
                         <td>@order.Number.ToString()</td>
                         <td>@order.Date.ToLongDateString()</td>
                         <td>@order.Provider?.Name.ToString()</td>
