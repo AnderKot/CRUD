@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Runtime.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ASP_MVC.Models
 {
@@ -42,20 +45,43 @@ namespace ASP_MVC.Models
             // определяем выбранные фильтры по дате
             DateTime dateFrom = DateTime.Parse(DateFrom);
             DateTime dateTo = DateTime.Parse(DateTo);
+            
+            string newJson;
+            IEnumerable<DateBaseOrderModel> Orders;
 
-            List<DateBaseOrderModel> OrdersList;
+            // Конвертер дат для 
+            var options = new JsonSerializerOptions() { WriteIndented = true };
+            options.Converters.Add(new CustomDateTimeConverter());
+
             using (DateBaseApplicationContext DB = new DateBaseApplicationContext())
             {
-                OrdersList  = DB.Orders.Where(order =>
-                                                (order.Date >= dateFrom) & (order.Date <= dateTo) &
-                                                (Number.Contains(order.Number) | Number == "Не выбран") &
-                                                (Provider.Contains(order.Provider.Name) | Number == "Не выбран")
-                                             ).ToList();
+                //IEnumerable<DateBaseOrderModel> Orders;
+                Orders = DB.Orders.Include(order => order.Provider).Where(order => (order.Date >= dateFrom) & (order.Date <= dateTo));
+                if (Number != null)
+                    Orders = Orders.Where(order => Number.Contains(order.Number));
+                if (Provider != null)
+                    Orders = Orders.Where(order => Provider.Contains(order.Provider.Name));
+                //OrdersList = Orders.ToList();
+
+                newJson = JsonSerializer.Serialize(Orders, options);
             }
 
-            string newJson = JsonSerializer.Serialize(OrdersList);
-
             return newJson;
+        }
+    }
+
+
+    public class CustomDateTimeConverter : JsonConverter<DateTime>
+    {
+        public CustomDateTimeConverter(){}
+
+        public override void Write(Utf8JsonWriter writer, DateTime date, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(date.ToLongDateString());
+        }
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return DateTime.Parse(reader.GetString()); // Не стоит заморачиваться, все равно обратно преобразовавать не нужно.
         }
     }
 }

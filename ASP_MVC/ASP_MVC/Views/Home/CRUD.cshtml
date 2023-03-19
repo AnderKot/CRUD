@@ -10,18 +10,18 @@
     <label>По </label>
     <input onChange="SelectFilters(this)" id="DateTo" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")">
 
-    <label for="Number">Номер </label>
-    <select onChange="SelectFilters(this)" id="Number" size="1">
-        <option selected="selected">Не Выбран</option>
+    <label for="Number" >Номер:</label>
+    <label class="MySelectedLabel" for="Number" id="Numberlabel"></label>
+    <select class="MySelectML" onChange="SelectFilters(this)" id="Number" size="1">
         @foreach (string option in Model.OrderNumber)
         {
             <option>@option</option>
         }
     </select>
 
-    <label for="Provider" >Поставщик </label>
-    <select onChange="SelectFilters(this)" id="Provider" size="1">
-        <option selected="selected">Не Выбран</option>
+    <label for="Provider" >Поставщик:</label>
+    <label class="MySelectedLabel" for="Provider" id="Providerlabel"></label>
+    <select class="MySelectML" onChange="SelectFilters(this)" id="Provider" size="1">
         @foreach (string option in Model.OrderProviderName)
         {
             <option>@option</option>

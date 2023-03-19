@@ -46,7 +46,7 @@ namespace ASP_MVC.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<string> Orders(string DateFrom, string DateTo, string Number, string Provider)
         {
-            if ((DateFrom == null) | (DateTo == null) | (Number == null) | (Provider == null))
+            if ((DateFrom == null) | (DateTo == null))
                 return BadRequest();
             
             string JsonOrders = _OrderModelManager.GetOrders(DateFrom, DateTo, Number, Provider);

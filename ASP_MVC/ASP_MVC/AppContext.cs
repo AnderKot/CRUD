@@ -41,8 +41,6 @@ namespace ASP_MVC
     {
         public int Id { get; set; }
         public string? Name { get; set; }
-
-        public List<DateBaseOrderModel> dateBaseOrderModels { get; set; } = new();
     }
 
     public class DateBaseApplicationContext : DbContext
