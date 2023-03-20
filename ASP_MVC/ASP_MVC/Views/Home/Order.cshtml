@@ -7,10 +7,10 @@
     <div class="modal-body">
         <div class="UperBar">
             <label>Номер: </label>
-            <input type="text" value="@Model.Header.Number">
+            <input type="text" id="Order_Number" value="@Model.Header.Number">
 
             <label>Дата: </label>
-            <input type="date" value="@Model.Header.Date.ToString("yyyy-MM-dd")">
+            <input type="date" id="Order_Date" value="@Model.Header.Date.ToString("yyyy-MM-dd")">
 
             <label for="Provider">Поставщик: </label>
             <label class="MySelectedLabel" for="ProviderName" id="ProviderNameLabel">@Model.Header.Provider.Name</label>
@@ -50,8 +50,7 @@
         </p>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="OrderSave_@Model.Header.Id.ToString()" onclick="SaveOrder(this)">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Delete</button>
+        <button type="button" class="btn btn-primary" id="OrderSave_@Model.Header.Id.ToString()" onclick="SaveOrder(this)">Сохранить</button>
     </div>
 </div>
 

@@ -16,6 +16,13 @@ namespace ASP_MVC
         public DateTime Date { get; set; }
         public int ProviderId { get; set; }
         public DateBaseProviderModel? Provider { get; set; }
+
+        public DateBaseOrderModel() { }
+
+        public DateBaseOrderModel(int id)
+        {
+            Id = id;
+        }
     }
 
     //public interface IOrder
@@ -41,6 +48,8 @@ namespace ASP_MVC
     {
         public int Id { get; set; }
         public string? Name { get; set; }
+
+        public DateBaseProviderModel() { }
 
         public DateBaseProviderModel(string? name)
         {

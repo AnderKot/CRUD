@@ -12,10 +12,14 @@ namespace ASP_MVC.Models
         
         OrderModel GetEmptyOrder();
 
+        bool DeleteOrder(string id);
+
+        bool SaveOrder(OrderJSON json);
+
         string GetOrders(string DateFrom, string DateTo, string Number, string Provider);
     }
 
-    public class OrderModel
+    public record OrderModel
     {
         // -- Свойства
         public DateBaseOrderModel Header { get; set; }
@@ -25,9 +29,9 @@ namespace ASP_MVC.Models
 
     public class OrderModelManager : IOrderModelManager
     {
-        public OrderModel GetOrder(string srtId)
+        public OrderModel GetOrder(string strId)
         {
-            int id = Int32.Parse(srtId);
+            int id = Int32.Parse(strId);
 
             OrderModel newOrderModel = new OrderModel();
 
@@ -90,10 +94,49 @@ namespace ASP_MVC.Models
                 newJson = JsonSerializer.Serialize(Orders, options);
             }
 
+            Console.Write(newJson);
+
             return newJson;
+        }
+
+        public bool DeleteOrder(string strid)
+        {
+            int id = Int32.Parse(strid);
+
+            using (DateBaseApplicationContext DB = new DateBaseApplicationContext())
+            {
+                DateBaseOrderModel Order = new DateBaseOrderModel(id);
+                try
+                {
+                    DB.Orders.Attach(Order);
+                    DB.Orders.Remove(Order);
+                    DB.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+
+                //DB.OrderItems.Where(item => item.OrderId == id);
+            }
+            return false;
+        }
+
+        public bool SaveOrder(OrderJSON json)
+        {
+            //OrderJSON Order = JsonSerializer.Deserialize<OrderJSON> (json);
+            return false;
         }
     }
 
+    public class OrderJSON
+    {
+        public string id { get; set; }
+        public string Number { get; set; }
+        public string Date { get; set; }
+        public string Provider { get; set; }
+    }
 
     public class CustomDateTimeConverter : JsonConverter<DateTime>
     {

@@ -44,6 +44,42 @@ namespace ASP_MVC.Controllers
             return PartialView(model);
         }
 
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult OrderPost([FromBody] OrderJSON json) //[FromQuery]
+        {
+            if (json != null)
+                return BadRequest();
+            
+
+            if(_OrderModelManager.SaveOrder(json))
+                return Ok();
+
+            return BadRequest();
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult OrderDelete(string id)
+        {
+            if (id == "-1") 
+                return Ok();
+
+            if (string.IsNullOrEmpty(id))
+                return BadRequest();
+
+            bool ok = _OrderModelManager.DeleteOrder(id);
+            if (ok)
+                return Ok();
+            else
+                return NotFound();
+
+            return BadRequest();
+        }
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

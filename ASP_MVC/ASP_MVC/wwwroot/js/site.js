@@ -49,16 +49,51 @@ function NewOrder() {
 }
 
 // Удаление заказа
-function DeleteOrder(order){
-    $('#modDialog').modal('hide');
-    let order_id = order.id.replace('OrderDelete_', '');
-    console.log('javascript_Order_OrderDelete_' + order_id);
+async function DeleteOrder(order) {
+    let order_id = order.id.replace('OrderDelete_', ''); 
+
+    let url = document.location.protocol + "//" + document.location.host + "/Home/OrderDelete?id=" + order_id;
+
+    const response = await fetch(url, {
+        method: 'DELETE'
+    })
+
+    let ok = await response.ok;
+    if (ok) {
+        $('#modDialog').modal('hide');
+        SetFilters(); // Пересобираем таблицу с заказами из бд
+    }
+
 }
 
 // Сохранение заказа
-function SaveOrder(order) {
+async function SaveOrder(order) {
     let order_id = order.id.replace('OrderSave_', '');
-    console.log('javascript_Order_OrderSave_' + order_id);
+    
+    let OrderJSON = {
+        //OrderJSON: {
+            id: order_id,
+            Number: document.getElementById('Order_Number').value,
+            Date: document.getElementById('Order_Date').value,
+            Provider: document.getElementById('ProviderNameLabel').innerHTML
+        //}
+    };
+    //id Number Date Provider
+    console.log('javascript_Order_OrderSave_' + JSON.stringify(OrderJSON));
+
+    let url = document.location.protocol + "//" + document.location.host + "/Home/OrderPost";
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify(OrderJSON)
+    })
+
+    let ok = await response.ok;
+    if (ok) {
+        SetFilters(); // Пересобираем таблицу с заказами из бд
+        console.log('javascript_Order_OrderSave_' + order_id);
+    }
 }
 
 // Установка фильтров по изменению в input и select
@@ -153,7 +188,7 @@ function Deleteitem(row) {
     row.parentNode.parentNode.parentNode.removeChild(row.parentNode.parentNode);
 }
 
-// Применение фильтров (Переривка таблицы)
+// Применение фильтров (Перерисовка таблицы)
 function SetFilters() {
 
     var GETurl = document.location.protocol + "//" + document.location.host + "/Home/Orders" +
