@@ -147,58 +147,67 @@ namespace ASP_MVC.Models
         {
             using (DateBaseApplicationContext DB = new DateBaseApplicationContext())
             {
-                DateBaseOrderModel newOrder;
+                // Работаем с Заказом
+                DateBaseOrderModel newOrder = new DateBaseOrderModel();
+                newOrder.Number = orderJSON.Number;
+                newOrder.Date = DateTime.Parse(orderJSON.Date);
+                try
+                {
+                    newOrder.ProviderId = DB.Providers.Where(provider => provider.Name == orderJSON.Provider).Distinct().Single().Id;
+                }
+                catch
+                {
+                    return false;
+                }
+
                 if (orderJSON.id == "-1")
                 {
-                    newOrder = new DateBaseOrderModel();
-                    newOrder.Number = orderJSON.Number;
-                    newOrder.Date = DateTime.Parse(orderJSON.Date);
-                    try
-                    {
-                        newOrder.ProviderId = DB.Providers.Where(provider => provider.Name == orderJSON.Provider).Distinct().Single().Id;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
+                    // Новый Заказ Добавляем
+                    DB.Orders.Add(newOrder);
+                }
+                else
+                {
+                    // Старый заказ Обновляем
+                    newOrder.Id =  Int32.Parse(orderJSON.id);
+                    DB.Entry(newOrder).State = EntityState.Modified;
+                }
 
-                    try
+
+                // Если есть строки добавляем\обновляем\удаляем
+                if (orderJSON.Items.Count == 0)
+                    return true;
+                else
+                {
+                    DateBaseOrderItemModel newItem;
+                    foreach (ItemJSON item in orderJSON.Items)
                     {
-                        DB.Orders.Add(newOrder);
-                        DB.SaveChanges();
-                        if(orderJSON.Items.Count == 0)
-                            return true;
+
+                        if (item.id == "-1")
+                        {
+                            newItem = new DateBaseOrderItemModel();
+                            newItem.Name = item.Name;
+                            newItem.Quantity = Decimal.Parse(item.Quantity);
+                            newItem.Unit = item.Unit;
+                            newItem.OrderId = newOrder.Id;
+                            DB.OrderItems.Add(newItem);
+                        }
                         else
                         {
 
                         }
                     }
-                    catch
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    newOrder = DB.Orders.Where(order => order.Id == Int32.Parse(orderJSON.id)).FirstOrDefault();
-                    newOrder.Number = orderJSON.Number;
-                    newOrder.Date = DateTime.Parse(orderJSON.Date);
-                    try
-                    {
-                        newOrder.ProviderId = DB.Providers.Where(provider => provider.Name == orderJSON.Provider).Distinct().Single().Id;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                    DB.Entry(newOrder).State = EntityState.Modified;
-                    DB.SaveChanges();
-                    if (orderJSON.Items.Count == 0)
-                        return true;
-                    else
-                    {
 
-                    }
+                }
+
+                // Пытаемся сохранить изменения
+                try
+                {
+                    DB.SaveChanges();
+                    return true;
+                }
+                catch
+                {
+                    return false;
                 }
             }
 
