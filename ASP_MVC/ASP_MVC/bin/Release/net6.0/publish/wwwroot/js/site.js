@@ -3,10 +3,10 @@
 
 // Write your JavaScript code.
 var CurrRow = null;
-var DateToFilter = null;
-var DateFromFilter = null;
-var NumberFilter = null;
-var ProviderFilter = null;
+var DateToFilter = moment().format('YYYY-MM-DD');
+var DateFromFilter = moment().add(-1, 'M').format('YYYY-MM-DD');
+var NumberFilter = "";
+var ProviderFilter = "";
 
 function ClickOnLine(row) {
     if (CurrRow == null) {
@@ -37,35 +37,56 @@ function DoubleClickOnLine(order_id) {
     });
 }
 
+// Установка фильтров по изменению в input и select
 function SelectFilters(imput) {
+    let newFilterPart;
     switch (imput.id) {
+
         case 'DateTo':
             DateToFilter = imput.value;
             console.log('javascript_' + imput.id + '_' + DateToFilter);
             break;
+
         case 'DateFrom':
             DateFromFilter = imput.value;
             console.log('javascript_' + imput.id + '_' + DateFromFilter);
             break;
+
         case 'Number':
-            let selectedOption = list.options[list.selectedIndex];
-            NumberFilter = selectedOption.text;
+            newFilterPart = imput.options[imput.selectedIndex].text;
+
+            if (!NumberFilter.includes(' '+newFilterPart))
+                NumberFilter += ' ' + newFilterPart;
+            else
+                NumberFilter = NumberFilter.replace(' ' + newFilterPart, '');
+
+            document.getElementById('Numberlabel').innerHTML = NumberFilter;
+
             console.log('javascript_' + imput.id + '_' + NumberFilter);
+            imput.selectedIndex = -1;
             break;
+
         case 'Provider':
-            let selectedOption = list.options[list.selectedIndex];
-            ProviderFilter = selectedOption.text;
+            newFilterPart = imput.options[imput.selectedIndex].text;
+
+            if (!ProviderFilter.includes(' ' + newFilterPart))
+                ProviderFilter += ' ' + newFilterPart;
+            else
+                ProviderFilter = ProviderFilter.replace(' ' + newFilterPart, '');
+
+            document.getElementById('Providerlabel').innerHTML =  ProviderFilter;
+
             console.log('javascript_' + imput.id + '_' + ProviderFilter);
+            imput.selectedIndex = -1;
             break;
     }
 }
 
+// Применение фильтров (Переривка таблицы)
 function SetFilters() {
-    DateFrom = DateFrom || moment().add(1, 'M').format('"yyyy-MM-dd');
-    DateTo = DateTo || moment().format('"yyyy-MM-dd');
 
     var GETurl = document.location.protocol + "//" + document.location.host + "/Home/Orders" +
-        "?DateFrom = " + DateFromFilter +
+        "?DateFrom=" + DateFromFilter +
         "&DateTo=" + DateToFilter +
         "&Number=" + NumberFilter +
         "&Provider=" + ProviderFilter;
@@ -75,19 +96,25 @@ function SetFilters() {
     $.get(GETurl, function (data) {
         let table = document.getElementById('OrderTableBody');
         while (table.firstChild) {
-            table.removeChild(myNode.firstChild);
+            table.removeChild(table.firstChild);
         }
 
-        let JsonData = data.json();
+        let JsonData = JSON.parse(data);
         let Rows = document.createDocumentFragment();
         JsonData.forEach(order => {
             let row = document.createElement('tr');
 
-            order.forEach(col => {
-                let td = document.createElement('td');
-                td.innerText = col;
-                row.appendChild(td);
-            });
+            let tdNumber = document.createElement('td');
+            tdNumber.innerText = order['Number'];
+            row.appendChild(tdNumber);
+
+            let tdDate = document.createElement('td');
+            tdDate.innerText = order['Date'];
+            row.appendChild(tdDate);
+
+            let tdProvName = document.createElement('td');
+            tdProvName.innerText = order['Provider']['Name'];
+            row.appendChild(tdProvName)
 
             Rows.appendChild(row);
         });

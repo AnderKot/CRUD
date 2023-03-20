@@ -1,7 +1,8 @@
 ﻿@model OrderModel
-<div class="modal-content">
+<div class="modal-content" style="min-width:1200px">
     <div class="modal-header">
-        <h4>Заказ ID: @Model.Header.Id</h4>
+        <h4>Заказ</h4>
+        <td><img src="Images\Icons\delete.png" width="40" height="40" id="OrderDelete_@Model.Header.Id.ToString()" onclick="DeleteOrder(this)" style="cursor:pointer"></td>
     </div>
     <div class="modal-body">
         <div class="UperBar">
@@ -11,39 +12,46 @@
             <label>Дата: </label>
             <input type="date" value="@Model.Header.Date.ToString("yyyy-MM-dd")">
 
-            <label>Поставщик: </label>
-            <input type="text" value="@Model.Header.Provider.Name">
+            <label for="Provider">Поставщик: </label>
+            <label class="MySelectedLabel" for="ProviderName" id="ProviderNameLabel">@Model.Header.Provider.Name</label>
+            <select class="MySelectML" onChange="Selectlabel(this)" id="ProviderName" size="1">
+                @foreach (DateBaseProviderModel option in Model.Providers)
+                {
+                    <option>@option.Name</option>
+                }
+            </select>
+
         </div>
         <p>
             <div class="tableContainer">
-                <table id="CRUD_Table" cols="число">
+                <table cols="число">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Название</th>
                             <th>Количество</th>
                             <th>Единица измерения</th>
+                            <th><img src="Images\Icons\plus.png" width="30" height="30" onclick="Additem()" style="cursor:pointer"></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="OrderItemTable">
                         @foreach (DateBaseOrderItemModel item in Model.Lines)
                         {
-                            <tr onclick="ClickOnLine(this)">
-                                <td>@item.Id.ToString()</td>
-                                <td>@item.Name</td>
-                                <td>@item.Quantity.ToString()</td>
-                                <td>@item.Unit</td>
+                            <tr onclick="ClickOnLine(this)" id="Item_@item.Id.ToString()">
+                                <td contenteditable="true">@item.Name</td>
+                                <td contenteditable="true">@item.Quantity.ToString()</td>
+                                <td contenteditable="true">@item.Unit</td>
+                                <td><img src="Images\Icons\delete.png" width="30" height="30" onclick="Deleteitem(this)" style="cursor:pointer"></td>
                             </tr>
                         }
                     </tbody>
-
+                    <tfoot> </tfoot>
                 </table>
             </div>
         </p>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="OrderSave_@Model.Header.Id.ToString()" onclick="SaveOrder(this)">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Delete</button>
     </div>
 </div>
 

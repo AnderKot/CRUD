@@ -8,11 +8,12 @@ var DateFromFilter = moment().add(-1, 'M').format('YYYY-MM-DD');
 var NumberFilter = "";
 var ProviderFilter = "";
 
+// Выделение выбранной строки
 function ClickOnLine(row) {
     if (CurrRow == null) {
         row.className = "SelectedRow";
         CurrRow = row;
-        console.log('javascript_' + CurrRow);
+        console.log('javascript_Row_' + CurrRow.id);
     }
     else {
         if (row.className == "SelectedRow") {
@@ -25,16 +26,39 @@ function ClickOnLine(row) {
 
             row.className = "SelectedRow";
             CurrRow = row;
-            console.log('javascript_' + CurrRow);
+            console.log('javascript_Row_' + CurrRow.id);
         }
     }
 }
 
-function DoubleClickOnLine(order_id) {
+// Открытие заказа на дабл клик
+function DoubleClickOnLine(row) {
+    let order_id = row.id; 
     $.get(document.location.protocol + "//" + document.location.host + "/Home/Order?id=" + order_id, function (data) {
         $('#dialogContent').html(data);
         $('#modDialog').modal('show');
     });
+}
+
+// Создание пустоко заказа
+function NewOrder() {
+    $.get(document.location.protocol + "//" + document.location.host + "/Home/Order?id=", function (data) {
+        $('#dialogContent').html(data);
+        $('#modDialog').modal('show');
+    });
+}
+
+// Удаление заказа
+function DeleteOrder(order){
+    $('#modDialog').modal('hide');
+    let order_id = order.id.replace('OrderDelete_', '');
+    console.log('javascript_Order_OrderDelete_' + order_id);
+}
+
+// Сохранение заказа
+function SaveOrder(order) {
+    let order_id = order.id.replace('OrderSave_', '');
+    console.log('javascript_Order_OrderSave_' + order_id);
 }
 
 // Установка фильтров по изменению в input и select
@@ -81,6 +105,53 @@ function SelectFilters(imput) {
             break;
     }
 }
+// Установка выбраной опции в поле
+function Selectlabel(imput) {
+    let label = document.getElementById(imput.id + 'Label');
+    label.innerHTML = imput.options[imput.selectedIndex].text;
+    imput.selectedIndex = -1;
+}
+
+// Добавление строки с товаром
+function Additem() {
+    let table = document.getElementById('OrderItemTable');
+    let row = document.createElement('tr');
+    row.onclick = function () {
+        ClickOnLine(this);
+    }
+    let tdName = document.createElement('td');
+    tdName.contentEditable = true;
+    tdName.innerText = "*";
+    row.appendChild(tdName);
+
+    let tdQuantity = document.createElement('td');
+    tdQuantity.innerText = "0";
+    tdQuantity.contentEditable = true;
+    row.appendChild(tdQuantity);
+
+    let tdUnit = document.createElement('td');
+    tdUnit.contentEditable = true;
+    tdUnit.innerText = "*";
+    row.appendChild(tdUnit);
+
+    let tdImage = document.createElement('td');
+    let Img = document.createElement('img');
+    Img.src = "Images\\Icons\\delete.png";
+    Img.width = 30;
+    Img.height = 30;
+    Img.onclick = function () {
+        Deleteitem(this);
+    }
+    tdImage.appendChild(Img);
+    row.appendChild(tdImage);
+
+    table.appendChild(row);
+}
+
+// Удаление строки
+function Deleteitem(row) {
+    row.parentNode.parentNode.parentNode.removeChild(row.parentNode.parentNode);
+}
 
 // Применение фильтров (Переривка таблицы)
 function SetFilters() {
@@ -103,6 +174,15 @@ function SetFilters() {
         let Rows = document.createDocumentFragment();
         JsonData.forEach(order => {
             let row = document.createElement('tr');
+
+            row.onclick = function () {
+                ClickOnLine(this);
+            }
+
+            row.id = order['Id']
+            row.ondblclick = function () {
+                DoubleClickOnLine(this);
+            }
 
             let tdNumber = document.createElement('td');
             tdNumber.innerText = order['Number'];

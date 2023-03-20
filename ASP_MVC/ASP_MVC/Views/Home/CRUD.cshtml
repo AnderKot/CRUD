@@ -33,7 +33,7 @@
     </button>
 
     <button class="PlusButton">
-        <label style ="cursor:pointer">Cоздать заказ</label>
+        <label onclick="NewOrder()" style="cursor:pointer">Cоздать заказ</label>
     </button>
 </div>
 
@@ -56,7 +56,7 @@
             <tbody id="OrderTableBody">
                 @foreach (DateBaseOrderModel order in Model.TableData)
                 {
-                    <tr onclick="ClickOnLine(this)" ondblclick="DoubleClickOnLine(@order.Id.ToString())">
+                    <tr onclick="ClickOnLine(this)" ondblclick="DoubleClickOnLine(this)" id="@order.Id.ToString()">
                         <td>@order.Number.ToString()</td>
                         <td>@order.Date.ToLongDateString()</td>
                         <td>@order.Provider?.Name.ToString()</td>

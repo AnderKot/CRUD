@@ -9,8 +9,10 @@ namespace ASP_MVC.Models
     public interface IOrderModelManager
     {
         OrderModel GetOrder(string id);
+        
+        OrderModel GetEmptyOrder();
 
-       string GetOrders(string DateFrom, string DateTo, string Number, string Provider);
+        string GetOrders(string DateFrom, string DateTo, string Number, string Provider);
     }
 
     public class OrderModel
@@ -18,6 +20,7 @@ namespace ASP_MVC.Models
         // -- Свойства
         public DateBaseOrderModel Header { get; set; }
         public List<DateBaseOrderItemModel> Lines { get; set; }
+        public List<DateBaseProviderModel> Providers { get; set; }
     }
 
     public class OrderModelManager : IOrderModelManager
@@ -35,6 +38,27 @@ namespace ASP_MVC.Models
                 newOrderModel.Header = DB.Orders.Include(order => order.Provider).Where(order => order.Id == id).Single();
                 // Список заказов
                 newOrderModel.Lines = DB.OrderItems.Where(item => item.OrderId == id).ToList();
+
+                newOrderModel.Providers = DB.Providers.Distinct().ToList();
+            }
+
+            return newOrderModel;
+        }
+
+        public OrderModel GetEmptyOrder()
+        {
+            OrderModel newOrderModel = new OrderModel();
+            newOrderModel.Header = new DateBaseOrderModel();
+            newOrderModel.Header.Id = -1;
+            newOrderModel.Header.Number = "";
+            newOrderModel.Header.Date = DateTime.Today;
+            newOrderModel.Header.Provider = new DateBaseProviderModel("");
+            
+            newOrderModel.Lines = new List<DateBaseOrderItemModel>();
+
+            using (DateBaseApplicationContext DB = new DateBaseApplicationContext())
+            {
+                newOrderModel.Providers = DB.Providers.Distinct().ToList();
             }
 
             return newOrderModel;

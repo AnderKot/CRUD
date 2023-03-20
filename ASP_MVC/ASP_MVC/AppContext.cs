@@ -41,6 +41,11 @@ namespace ASP_MVC
     {
         public int Id { get; set; }
         public string? Name { get; set; }
+
+        public DateBaseProviderModel(string? name)
+        {
+            Name = name;
+        }
     }
 
     public class DateBaseApplicationContext : DbContext

@@ -26,14 +26,18 @@ namespace ASP_MVC.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Order(string id)
         {
-            if (string.IsNullOrEmpty(id))
-                return BadRequest();
+            OrderModel model;
 
-            OrderModel model = _OrderModelManager.GetOrder(id);
+            if (string.IsNullOrEmpty(id))
+            {
+                model = _OrderModelManager.GetEmptyOrder();
+                return PartialView(model);
+            }
+
+            model = _OrderModelManager.GetOrder(id);
             if (model == null)
                 return NotFound();
 
