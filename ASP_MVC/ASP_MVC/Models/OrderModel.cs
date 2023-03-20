@@ -19,12 +19,32 @@ namespace ASP_MVC.Models
         string GetOrders(string DateFrom, string DateTo, string Number, string Provider);
     }
 
+    // Модел для представления Заказа
     public record OrderModel
     {
         // -- Свойства
         public DateBaseOrderModel Header { get; set; }
         public List<DateBaseOrderItemModel> Lines { get; set; }
         public List<DateBaseProviderModel> Providers { get; set; }
+    }
+
+    // Формат заказа для POST запроса
+    public class OrderJSON
+    {
+        public string id { get; set; }
+        public string Number { get; set; }
+        public string Date { get; set; }
+        public string Provider { get; set; }
+        public List<ItemJSON> Items { get; set; }
+    }
+
+    // Формат товара для POST запроса
+    public class ItemJSON
+    {
+        public string id { get; set; }
+        public string Name { get; set; }
+        public string Quantity { get; set; }
+        public string Unit { get; set; }
     }
 
     public class OrderModelManager : IOrderModelManager
@@ -109,7 +129,7 @@ namespace ASP_MVC.Models
                 try
                 {
                     DB.Orders.Attach(Order);
-                    DB.Orders.Remove(Order);
+                    DB.Orders.Remove(Order); // Строки удаляться каскадом
                     DB.SaveChanges();
                     return true;
                 }
@@ -123,21 +143,72 @@ namespace ASP_MVC.Models
             return false;
         }
 
-        public bool SaveOrder(OrderJSON json)
+        public bool SaveOrder(OrderJSON orderJSON)
         {
+            using (DateBaseApplicationContext DB = new DateBaseApplicationContext())
+            {
+                DateBaseOrderModel newOrder;
+                if (orderJSON.id == "-1")
+                {
+                    newOrder = new DateBaseOrderModel();
+                    newOrder.Number = orderJSON.Number;
+                    newOrder.Date = DateTime.Parse(orderJSON.Date);
+                    try
+                    {
+                        newOrder.ProviderId = DB.Providers.Where(provider => provider.Name == orderJSON.Provider).Distinct().Single().Id;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+
+                    try
+                    {
+                        DB.Orders.Add(newOrder);
+                        DB.SaveChanges();
+                        if(orderJSON.Items.Count == 0)
+                            return true;
+                        else
+                        {
+
+                        }
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    newOrder = DB.Orders.Where(order => order.Id == Int32.Parse(orderJSON.id)).FirstOrDefault();
+                    newOrder.Number = orderJSON.Number;
+                    newOrder.Date = DateTime.Parse(orderJSON.Date);
+                    try
+                    {
+                        newOrder.ProviderId = DB.Providers.Where(provider => provider.Name == orderJSON.Provider).Distinct().Single().Id;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                    DB.Entry(newOrder).State = EntityState.Modified;
+                    DB.SaveChanges();
+                    if (orderJSON.Items.Count == 0)
+                        return true;
+                    else
+                    {
+
+                    }
+                }
+            }
+
+
             //OrderJSON Order = JsonSerializer.Deserialize<OrderJSON> (json);
             return false;
         }
     }
 
-    public class OrderJSON
-    {
-        public string id { get; set; }
-        public string Number { get; set; }
-        public string Date { get; set; }
-        public string Provider { get; set; }
-    }
-
+    // Кастомный сериализатор в удобоворимую форму даты для таблицы
     public class CustomDateTimeConverter : JsonConverter<DateTime>
     {
         public CustomDateTimeConverter(){}

@@ -72,12 +72,31 @@ async function SaveOrder(order) {
     
     let OrderJSON = {
         //OrderJSON: {
-            id: order_id,
-            Number: document.getElementById('Order_Number').value,
-            Date: document.getElementById('Order_Date').value,
-            Provider: document.getElementById('ProviderNameLabel').innerHTML
+        id: order_id,
+        Number: document.getElementById('Order_Number').value,
+        Date: document.getElementById('Order_Date').value,
+        Provider: document.getElementById('ProviderNameLabel').innerHTML,
+        Items: []
         //}
     };
+
+    let table = document.getElementById('OrderItemTable');
+
+    for (let i = 0; i < table.rows.length; i++) {
+        let tableRow = table.rows[i];
+        let id = tableRow.id.replace('Item_', '');
+        if (id == '')
+            id = '-1';
+        let itemJSON = {
+            id: id,
+            Name: tableRow.cells[0].innerHTML,
+            Quantity: tableRow.cells[1].innerHTML,
+            Unit: tableRow.cells[2].innerHTML
+        }
+
+        OrderJSON.Items.push(itemJSON);
+    } 
+
     //id Number Date Provider
     console.log('javascript_Order_OrderSave_' + JSON.stringify(OrderJSON));
 

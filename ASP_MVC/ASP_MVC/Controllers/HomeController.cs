@@ -47,13 +47,14 @@ namespace ASP_MVC.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult OrderPost([FromBody] OrderJSON json) //[FromQuery]
+        public IActionResult OrderPost([FromBody] OrderJSON json)
         {
-            if (json != null)
+            if (json == null)
                 return BadRequest();
-            
+            if (json.id == null)
+                return BadRequest();
 
-            if(_OrderModelManager.SaveOrder(json))
+            if (_OrderModelManager.SaveOrder(json))
                 return Ok();
 
             return BadRequest();
