@@ -5,7 +5,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>D:\Programs\GIT\CRUD\ASP_MVC\ASP_MVC\bin\Release\net6.0\publish\</_PublishTargetUrl>
-    <History>True|2023-03-19T23:29:17.3487569Z;True|2023-03-18T02:17:40.9276170+03:00;True|2023-03-16T21:47:55.0552027+03:00;True|2023-03-16T02:22:35.1984896+03:00;True|2023-03-16T01:37:14.0648097+03:00;True|2023-03-15T22:59:12.7133592+03:00;</History>
+    <History>True|2023-03-20T10:03:35.0322531Z;True|2023-03-20T02:29:17.3487569+03:00;True|2023-03-18T02:17:40.9276170+03:00;True|2023-03-16T21:47:55.0552027+03:00;True|2023-03-16T02:22:35.1984896+03:00;True|2023-03-16T01:37:14.0648097+03:00;True|2023-03-15T22:59:12.7133592+03:00;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>

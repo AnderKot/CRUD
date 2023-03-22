@@ -1,6 +1,8 @@
 ﻿using ASP_MVC.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace ASP_MVC.Controllers
 {
@@ -47,15 +49,22 @@ namespace ASP_MVC.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult OrderPost([FromBody] OrderJSON json)
+        public ActionResult<string> OrderPost([FromBody] OrderJSON json)
         {
             if (json == null)
                 return BadRequest();
             if (json.id == null)
                 return BadRequest();
 
-            if (_OrderModelManager.SaveOrder(json))
-                return Ok();
+            int OrderId = _OrderModelManager.SaveOrder(json);
+            if (OrderId != -1)
+            {
+                return JsonSerializer.Serialize(OrderId);
+            }
+            else
+            {
+                return BadRequest();
+            }
 
             return BadRequest();
         }

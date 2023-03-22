@@ -59,6 +59,7 @@ async function DeleteOrder(order) {
     })
 
     let ok = await response.ok;
+
     if (ok) {
         $('#modDialog').modal('hide');
         SetFilters(); // Пересобираем таблицу с заказами из бд
@@ -93,12 +94,11 @@ async function SaveOrder(order) {
             Quantity: tableRow.cells[1].innerHTML,
             Unit: tableRow.cells[2].innerHTML
         }
-
         OrderJSON.Items.push(itemJSON);
     } 
 
     //id Number Date Provider
-    console.log('javascript_Order_OrderSave_' + JSON.stringify(OrderJSON));
+    console.log('javascript_Order_TryOrderSave_' + JSON.stringify(OrderJSON));
 
     let url = document.location.protocol + "//" + document.location.host + "/Home/OrderPost";
 
@@ -110,8 +110,17 @@ async function SaveOrder(order) {
 
     let ok = await response.ok;
     if (ok) {
+        let OrderId = response.body;
+        
+        let DeleteBtn = document.getElementById('OrderDelete_-1');
+        if (DeleteBtn != null) {
+            DeleteBtn.id = 'OrderDelete_' + OrderId;
+            order.id = 'OrderSave_' + OrderId;
+        }
+        
+
         SetFilters(); // Пересобираем таблицу с заказами из бд
-        console.log('javascript_Order_OrderSave_' + order_id);
+        console.log('javascript_Order_OrderSaved_' + order.id);
     }
 }
 

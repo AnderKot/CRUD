@@ -14,7 +14,7 @@ namespace ASP_MVC.Models
 
         bool DeleteOrder(string id);
 
-        bool SaveOrder(OrderJSON json);
+        int SaveOrder(OrderJSON json);
 
         string GetOrders(string DateFrom, string DateTo, string Number, string Provider);
     }
@@ -143,7 +143,9 @@ namespace ASP_MVC.Models
             return false;
         }
 
-        public bool SaveOrder(OrderJSON orderJSON)
+
+        // Сохранение (Создание) заказа
+        public int SaveOrder(OrderJSON orderJSON)
         {
             using (DateBaseApplicationContext DB = new DateBaseApplicationContext())
             {
@@ -157,7 +159,7 @@ namespace ASP_MVC.Models
                 }
                 catch
                 {
-                    return false;
+                    return -1;
                 }
 
                 if (orderJSON.id == "-1")
@@ -169,51 +171,70 @@ namespace ASP_MVC.Models
                 {
                     // Старый заказ Обновляем
                     newOrder.Id =  Int32.Parse(orderJSON.id);
-                    DB.Entry(newOrder).State = EntityState.Modified;
+                    DB.Orders.Entry(newOrder).State = EntityState.Modified;
                 }
 
 
                 // Если есть строки добавляем\обновляем\удаляем
-                if (orderJSON.Items.Count == 0)
-                    return true;
-                else
+                if (orderJSON.Items.Any())
                 {
-                    DateBaseOrderItemModel newItem;
+                    List<int> IdList = new List<int>();
+
                     foreach (ItemJSON item in orderJSON.Items)
                     {
-
-                        if (item.id == "-1")
-                        {
-                            newItem = new DateBaseOrderItemModel();
-                            newItem.Name = item.Name;
-                            newItem.Quantity = Decimal.Parse(item.Quantity);
-                            newItem.Unit = item.Unit;
-                            newItem.OrderId = newOrder.Id;
-                            DB.OrderItems.Add(newItem);
-                        }
-                        else
-                        {
-
-                        }
+                        IdList.Add(Int32.Parse(item.id));
                     }
 
+                    DateBaseOrderItemModel newItem;
+                    // Удаляем 
+                    IEnumerable<DateBaseOrderItemModel> ItemToDelete = DB.OrderItems.Where(item => (item.OrderId == newOrder.Id));
+                    ItemToDelete.Where(item => !IdList.Contains(item.Id));
+                    if (ItemToDelete.Any())
+                        DB.OrderItems.RemoveRange(ItemToDelete);
+
+                    // Обновляем
+                    foreach (ItemJSON item in orderJSON.Items.Where(item => item.id != "-1"))
+                    {
+                        newItem = new DateBaseOrderItemModel();
+                        newItem.Id = Int32.Parse(item.id);
+                        newItem.Name = item.Name;
+                        newItem.Quantity = Decimal.Parse(item.Quantity);
+                        newItem.Unit = item.Unit;
+                        newItem.OrderId = newOrder.Id;
+                        DB.OrderItems.Entry(newItem).State = EntityState.Modified;
+                    }
+
+                    // Добавляем
+                    foreach (ItemJSON item in orderJSON.Items.Where(item => item.id == "-1"))
+                    {
+                        newItem = new DateBaseOrderItemModel();
+                        newItem.Name = item.Name;
+                        newItem.Quantity = Decimal.Parse(item.Quantity);
+                        newItem.Unit = item.Unit;
+                        newItem.OrderId = newOrder.Id;
+                        DB.OrderItems.Add(newItem);
+                    }
                 }
 
                 // Пытаемся сохранить изменения
                 try
                 {
                     DB.SaveChanges();
-                    return true;
+                    //if (orderJSON.id == "-1")
+                    //{
+                    //    return DB.Orders.Where(order => ((order.Number == newOrder.Number) & (order.ProviderId == newOrder.ProviderId))).Single().Id;
+                    //}
+                    return newOrder.Id; // Если изменения были проведены возвраящаем актуальный номер заказа
                 }
                 catch
                 {
-                    return false;
+                    return -1;
                 }
             }
 
 
             //OrderJSON Order = JsonSerializer.Deserialize<OrderJSON> (json);
-            return false;
+            return -1;
         }
     }
 
