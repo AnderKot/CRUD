@@ -25,14 +25,6 @@ namespace ASP_MVC
         }
     }
 
-    //public interface IOrder
-    //{
-    //    int Id { get; set; }
-    //    string Number { get; set;}
-    //    DateTime Date { get; set; }
-    //    int ProviderId { get; set; }
-    //}
-
     public class DateBaseOrderItemModel
     {
         public int Id { get; set; }
@@ -63,7 +55,7 @@ namespace ASP_MVC
         public DbSet<DateBaseOrderItemModel> OrderItems => Set<DateBaseOrderItemModel>();
         public DbSet<DateBaseProviderModel> Providers => Set<DateBaseProviderModel>();
 
-        //public DateBaseApplicationContext() => Database.EnsureCreated();
+        public DateBaseApplicationContext() => Database.EnsureCreated();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
