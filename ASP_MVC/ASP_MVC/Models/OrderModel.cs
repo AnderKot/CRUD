@@ -291,6 +291,8 @@ namespace ASP_MVC.Models
                         newItem = new DateBaseOrderItemModel();
                         newItem.Id = Int32.Parse(item.id);
                         newItem.Name = item.Name;
+                        if (newOrder.Number == newItem.Name)
+                            return -1;
                         try
                         {
                             newItem.Quantity = Decimal.Parse(item.Quantity.Replace('.', ','));
@@ -309,6 +311,8 @@ namespace ASP_MVC.Models
                     {
                         newItem = new DateBaseOrderItemModel();
                         newItem.Name = item.Name;
+                        if (newOrder.Number == newItem.Name)
+                            return -1;
                         try
                         {
                             newItem.Quantity = Decimal.Parse(item.Quantity.Replace('.', ','));
