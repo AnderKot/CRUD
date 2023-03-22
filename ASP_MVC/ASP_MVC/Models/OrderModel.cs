@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
@@ -17,6 +18,8 @@ namespace ASP_MVC.Models
         int SaveOrder(OrderJSON json);
 
         string GetOrders(string DateFrom, string DateTo, string Number, string Provider);
+
+        string GetOrderItems(string id,string Name, string Quantity, string Unit);
     }
 
     // Модел для представления Заказа
@@ -26,6 +29,9 @@ namespace ASP_MVC.Models
         public DateBaseOrderModel Header { get; set; }
         public List<DateBaseOrderItemModel> Lines { get; set; }
         public List<DateBaseProviderModel> Providers { get; set; }
+        public List<string> NameFilterOptions { get; set; }
+        public List<string> QuantityFilterOptions { get; set; }
+        public List<string> UnitFilterOptions { get; set; }
     }
 
     // Формат заказа для POST запроса
@@ -45,6 +51,18 @@ namespace ASP_MVC.Models
         public string Name { get; set; }
         public string Quantity { get; set; }
         public string Unit { get; set; }
+
+        public ItemJSON() { }
+
+        public ItemJSON(DateBaseOrderItemModel DBItem)
+        {
+            id = DBItem.Id.ToString();
+            Name = DBItem.Name;
+            Quantity = DBItem.Quantity.ToString();
+            Unit = DBItem.Unit;
+        }
+
+        public static explicit operator ItemJSON(DateBaseOrderItemModel DBItem) => new ItemJSON(DBItem);
     }
 
     public class OrderModelManager : IOrderModelManager
@@ -61,7 +79,17 @@ namespace ASP_MVC.Models
                 // Список Заголовок Заказа
                 newOrderModel.Header = DB.Orders.Include(order => order.Provider).Where(order => order.Id == id).Single();
                 // Список заказов
-                newOrderModel.Lines = DB.OrderItems.Where(item => item.OrderId == id).ToList();
+                IEnumerable<DateBaseOrderItemModel> LinesBuf = DB.OrderItems.Where(item => item.OrderId == id);
+                newOrderModel.Lines = LinesBuf.ToList();
+
+                newOrderModel.NameFilterOptions = new List<string>();
+                newOrderModel.NameFilterOptions.AddRange(LinesBuf.Select(line => line.Name).Distinct().ToList());
+                
+                newOrderModel.QuantityFilterOptions = new List<string>();
+                newOrderModel.QuantityFilterOptions.AddRange(LinesBuf.Select(line => line.Quantity.ToString()).Distinct().ToList());
+                
+                newOrderModel.UnitFilterOptions = new List<string>();
+                newOrderModel.UnitFilterOptions.AddRange(LinesBuf.Select(line => line.Unit).Distinct().ToList());
 
                 newOrderModel.Providers = DB.Providers.Distinct().ToList();
             }
@@ -83,6 +111,9 @@ namespace ASP_MVC.Models
             using (DateBaseApplicationContext DB = new DateBaseApplicationContext())
             {
                 newOrderModel.Providers = DB.Providers.Distinct().ToList();
+                newOrderModel.NameFilterOptions = new List<string>();
+                newOrderModel.QuantityFilterOptions = new List<string>();
+                newOrderModel.UnitFilterOptions = new List<string>();
             }
 
             return newOrderModel;
@@ -90,10 +121,21 @@ namespace ASP_MVC.Models
 
         public string GetOrders(string DateFrom, string DateTo, string Number, string Provider)
         {
+            CRUDModel newCRUDModel = new CRUDModel();
+
             // определяем выбранные фильтры по дате
-            DateTime dateFrom = DateTime.Parse(DateFrom);
-            DateTime dateTo = DateTime.Parse(DateTo);
-            
+            DateTime dateFrom;
+            if (DateFrom != null)
+                dateFrom = DateTime.Parse(DateFrom);
+            else
+                dateFrom = DateTime.Today.AddMonths(-1);
+
+            DateTime dateTo;
+            if (DateTo != null)
+                dateTo = DateTime.Parse(DateTo);
+            else
+                dateTo = DateTime.Today.AddMonths(-1);
+
             string newJson;
             IEnumerable<DateBaseOrderModel> Orders;
 
@@ -103,7 +145,7 @@ namespace ASP_MVC.Models
 
             using (DateBaseApplicationContext DB = new DateBaseApplicationContext())
             {
-                //IEnumerable<DateBaseOrderModel> Orders;
+                // Список заказов по фильтрам
                 Orders = DB.Orders.Include(order => order.Provider).Where(order => (order.Date >= dateFrom) & (order.Date <= dateTo));
                 if (Number != null)
                     Orders = Orders.Where(order => Number.Contains(order.Number));
@@ -111,7 +153,18 @@ namespace ASP_MVC.Models
                     Orders = Orders.Where(order => Provider.Contains(order.Provider.Name));
                 //OrdersList = Orders.ToList();
 
-                newJson = JsonSerializer.Serialize(Orders, options);
+                // Список номеров заказов для выбора фильтра
+                newCRUDModel.OrderNumber = DB.Orders.Where(order => (order.Date >= dateFrom) & (order.Date <= dateTo)).Select(order => order.Number).Distinct().ToList();
+
+                // Список имен поставщиков для выбора фильтра
+                newCRUDModel.OrderProviderName = DB.Orders.Include(order => order.Provider).Where(order => (order.Date >= dateFrom) & (order.Date <= dateTo)).Select(order => order.Provider.Name).Distinct().ToList();
+
+                // Список заказов
+                newCRUDModel.TableData = DB.Orders.Include(order => order.Provider).Where(order => (order.Date >= dateFrom) & (order.Date <= dateTo)).ToList();
+
+                newCRUDModel.TableData = Orders.ToList();
+                
+                newJson = JsonSerializer.Serialize(newCRUDModel, options);
             }
 
             Console.Write(newJson);
@@ -119,9 +172,9 @@ namespace ASP_MVC.Models
             return newJson;
         }
 
-        public bool DeleteOrder(string strid)
+        public bool DeleteOrder(string strID)
         {
-            int id = Int32.Parse(strid);
+            int id = Int32.Parse(strID);
 
             using (DateBaseApplicationContext DB = new DateBaseApplicationContext())
             {
@@ -143,6 +196,37 @@ namespace ASP_MVC.Models
             return false;
         }
 
+
+        // Выгрузка строк заказа по фильтрам
+        public string GetOrderItems(string strID, string Name, string Quantity, string Unit)
+        {
+            OrderModel newOrderModel = new OrderModel();
+
+            int id = Int32.Parse(strID);
+            decimal quantity = 0;
+            if (Quantity != null)
+                quantity = decimal.Parse(Quantity);
+
+            using (DateBaseApplicationContext DB = new DateBaseApplicationContext())
+            {
+                IEnumerable<DateBaseOrderItemModel> DBItems = DB.OrderItems.Where(item => item.OrderId == id);
+                
+                if (Name != null)
+                    DBItems.Where(item => Name.Contains(item.Name));
+                
+                if (Quantity != null)
+                    DBItems.Where(item => quantity.Equals(item.Quantity));
+                
+                if (Unit != null)
+                    DBItems.Where(item => Unit.Contains(item.Unit));
+
+                DBItems.ToList().ForEach(DBItem => newOrderModel.Lines.Add(DBItem));
+            }
+
+            string newJson = JsonSerializer.Serialize(newOrderModel);
+
+            return newJson;
+        }
 
         // Сохранение (Создание) заказа
         public int SaveOrder(OrderJSON orderJSON)
@@ -174,6 +258,15 @@ namespace ASP_MVC.Models
                     DB.Orders.Entry(newOrder).State = EntityState.Modified;
                 }
 
+                // Сначала сохраняем заголовок заказа
+                try
+                {
+                    DB.SaveChanges();
+                }
+                catch
+                {
+                    return -1;
+                }
 
                 // Если есть строки добавляем\обновляем\удаляем
                 if (orderJSON.Items.Any())
@@ -198,7 +291,14 @@ namespace ASP_MVC.Models
                         newItem = new DateBaseOrderItemModel();
                         newItem.Id = Int32.Parse(item.id);
                         newItem.Name = item.Name;
-                        newItem.Quantity = Decimal.Parse(item.Quantity);
+                        try
+                        {
+                            newItem.Quantity = Decimal.Parse(item.Quantity.Replace('.', ','));
+                        }
+                        catch
+                        {
+                            return -1;
+                        }
                         newItem.Unit = item.Unit;
                         newItem.OrderId = newOrder.Id;
                         DB.OrderItems.Entry(newItem).State = EntityState.Modified;
@@ -209,7 +309,14 @@ namespace ASP_MVC.Models
                     {
                         newItem = new DateBaseOrderItemModel();
                         newItem.Name = item.Name;
-                        newItem.Quantity = Decimal.Parse(item.Quantity);
+                        try
+                        {
+                            newItem.Quantity = Decimal.Parse(item.Quantity.Replace('.', ','));
+                        }
+                        catch
+                        {
+                            return -1;
+                        }
                         newItem.Unit = item.Unit;
                         newItem.OrderId = newOrder.Id;
                         DB.OrderItems.Add(newItem);
@@ -220,10 +327,6 @@ namespace ASP_MVC.Models
                 try
                 {
                     DB.SaveChanges();
-                    //if (orderJSON.id == "-1")
-                    //{
-                    //    return DB.Orders.Where(order => ((order.Number == newOrder.Number) & (order.ProviderId == newOrder.ProviderId))).Single().Id;
-                    //}
                     return newOrder.Id; // Если изменения были проведены возвраящаем актуальный номер заказа
                 }
                 catch

@@ -1,7 +1,7 @@
 ﻿@model CRUDModel
 
 <div class="UperBar">
-    <label top: calc(50% - 20px);>Фильтр: </label>
+    <h5 top:20px;>Фильтр</h5>
 
 
     <label>Дата C </label>
@@ -13,6 +13,7 @@
     <label for="Number" >Номер:</label>
     <label class="MySelectedLabel" for="Number" id="Numberlabel"></label>
     <select class="MySelectML" onChange="SelectFilters(this)" id="Number" size="1">
+        <option hidden selected>Костыль</option>
         @foreach (string option in Model.OrderNumber)
         {
             <option>@option</option>
@@ -22,6 +23,7 @@
     <label for="Provider" >Поставщик:</label>
     <label class="MySelectedLabel" for="Provider" id="Providerlabel"></label>
     <select class="MySelectML" onChange="SelectFilters(this)" id="Provider" size="1">
+        <option hidden selected>Костыль</option>
         @foreach (string option in Model.OrderProviderName)
         {
             <option>@option</option>
@@ -44,27 +46,31 @@
 </p>
 
 <p>
+    
     <div class="tableContainer">
-        <table id="CRUD_Table" cols="число">
-            <thead>
-                <tr>
-                    <th>Заказ Но.</th>
-                    <th>Дата</th>
-                    <th>Поставщик</th>
-                </tr>
-            </thead>
-            <tbody id="OrderTableBody">
-                @foreach (DateBaseOrderModel order in Model.TableData)
-                {
-                    <tr onclick="ClickOnLine(this)" ondblclick="DoubleClickOnLine(this)" id="@order.Id.ToString()">
-                        <td>@order.Number.ToString()</td>
-                        <td>@order.Date.ToLongDateString()</td>
-                        <td>@order.Provider?.Name.ToString()</td>
+        <h5 top:20px;>Заказы</h5>
+        <p>
+            <table id="CRUD_Table" cols="число">
+                <thead>
+                    <tr>
+                        <th>Заказ Но.</th>
+                        <th>Дата</th>
+                        <th>Поставщик</th>
                     </tr>
-                }
-            </tbody>
+                </thead>
+                <tbody id="OrderTableBody">
+                    @foreach (DateBaseOrderModel order in Model.TableData)
+                    {
+                        <tr onclick="ClickOnLine(this)" ondblclick="DoubleClickOnLine(this)" id="@order.Id.ToString()">
+                            <td>@order.Number.ToString()</td>
+                            <td>@order.Date.ToLongDateString()</td>
+                            <td>@order.Provider?.Name.ToString()</td>
+                        </tr>
+                    }
+                </tbody>
 
-        </table>
+            </table>
+        </p>
     </div>
 <p/>
 

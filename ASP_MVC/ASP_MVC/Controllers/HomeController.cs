@@ -20,12 +20,14 @@ namespace ASP_MVC.Controllers
             _OrderModelManager = OrderModelManager;
         }
 
+        // Отгрузка всей страницы приложения
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult CRUD()
         {
             return View(_CRUDModelManager.GetCRUDModel());
         }
 
+        // Модальное окно для заказа
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -46,6 +48,7 @@ namespace ASP_MVC.Controllers
             return PartialView(model);
         }
 
+        // Добавление/обновление заказа
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -69,6 +72,7 @@ namespace ASP_MVC.Controllers
             return BadRequest();
         }
 
+        // Удаление заказа
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -90,20 +94,34 @@ namespace ASP_MVC.Controllers
             return BadRequest();
         }
 
+        // Отправка заказов для перерисовки таблицы по фильтрам
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<string> Orders(string DateFrom, string DateTo, string Number, string Provider)
         {
-            if ((DateFrom == null) | (DateTo == null))
-                return BadRequest();
-            
             string JsonOrders = _OrderModelManager.GetOrders(DateFrom, DateTo, Number, Provider);
             
             if (JsonOrders == null)
                 return NotFound();
             
+            return JsonOrders;
+        }
+
+        // Отправка строк заказа для перерисовки таблицы по фильтрам
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<string> Items(string id, string Name, string Quantity, string Unit)
+        {
+
+            string JsonOrders = _OrderModelManager.GetOrderItems(id, Name, Quantity, Unit);
+
+            if (JsonOrders == null)
+                return NotFound();
+
             return JsonOrders;
         }
 

@@ -1,11 +1,8 @@
 ﻿@model OrderModel
 <div class="modal-content" style="min-width:600px">
     <div class="modal-header">
-        <h4>Заказ</h4>
-        <td><img src="Images\Icons\delete.png" width="40" height="40" id="OrderDelete_@Model.Header.Id.ToString()" onclick="DeleteOrder(this)" style="cursor:pointer"></td>
-    </div>
-    <div class="modal-body">
         <div class="UperBar">
+            <h5>Заказ</h5>
             <label>Номер: </label>
             <input type="text" id="Order_Number" value="@Model.Header.Number">
 
@@ -15,12 +12,54 @@
             <label for="Provider">Поставщик: </label>
             <label class="MySelectedLabel" for="ProviderName" id="ProviderNameLabel">@Model.Header.Provider.Name</label>
             <select class="MySelectML" onChange="Selectlabel(this)" id="ProviderName" size="1">
+                <option hidden selected>Костыль</option>
                 @foreach (DateBaseProviderModel option in Model.Providers)
                 {
                     <option>@option.Name</option>
                 }
             </select>
+   
+        </div>        
+        <img src="Images\Icons\delete.png" width="50" height="50" id="OrderDelete_@Model.Header.Id.ToString()" onclick="DeleteOrder(this)" style="cursor:pointer; margin-left:40px;">
+    </div>
+    <div class="modal-body">
+        <div class="UperBar">
+            <h6>Фильтр: </h6>
 
+            <label for="Name">Наименование:</label>
+            <label class="MySelectedLabel" for="Name" id="Namelabel"></label>
+            <select class="MySelectML" onChange="SelectFilters(this)" id="Name" size="1">
+                <option hidden selected>Костыль</option>
+                @foreach (string option in Model.NameFilterOptions)
+                {
+                    <option>@option</option>
+                }
+            </select>
+
+
+            <label for="Quantity">Количество:</label>
+            <label class="MySelectedLabel" for="Quantity" id="Quantitylabel"></label>
+            <select class="MySelectML" onChange="SelectFilters(this)" id="Quantity" size="1">
+                <option hidden selected>Костыль</option>
+                @foreach (string option in Model.QuantityFilterOptions)
+                {
+                    <option>@option</option>
+                }
+            </select>
+
+            <label for="Unit">Ед. Измерения:</label>
+            <label class="MySelectedLabel" for="Unit" id="Unitlabel"></label>
+            <select class="MySelectML" onChange="SelectFilters(this)" id="Unit" size="1">
+                <option hidden selected>Костыль</option>
+                @foreach (string option in Model.UnitFilterOptions)
+                {
+                    <option>@option</option>
+                }
+            </select>
+
+            <button class="FilterButton">
+                <label onclick="SetFilters()" style="cursor:pointer">Применить фильтр</label>
+            </button>
         </div>
         <p>
             <div class="tableContainer">

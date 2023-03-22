@@ -29,6 +29,4 @@ app.MapControllerRoute(
     pattern: "{controller}/{action}",
     defaults: new { controller = "Home", action = "CRUD" });
 
-
-
 app.Run();
